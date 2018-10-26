@@ -1,0 +1,65 @@
+1、私服位置
+maven的本地私服：http://192.168.21.166:28081/nexus
+用户名： admin
+密码： admin123
+
+
+2、manven配置
+
+maven的settings.xml配置：( 注意下，实际使用的是全局安装的maven还是idea等IDE内置的maven，配置文件settings.xml位置不一样)
+在<Servers>节点中增加如下配置
+	<server>
+      <id>alphasta</id>
+      <username>admin</username>
+      <password>admin123</password>
+    </server>
+	
+3、项目配置
+在maven项目的pom.xml增加如下配置：
+	<distributionManagement>
+		<repository>
+			<id>alphasta</id>
+			<name>内部发布</name>
+			<url>http://192.168.21.166:28081/nexus/content/repositories/releases/</url>
+		</repository>
+		<snapshotRepository>
+			<id>alphasta</id>
+			<name>内部发布</name>
+			<url>http://192.168.21.166:28081//nexus/content/repositories/snapshots/</url>
+		</snapshotRepository>
+	</distributionManagement>
+	
+4、发布到私服：
+	在项目根目录运行：mvn clean deploy -X -Dmaven.test.skip=true
+
+	发布Release版本： 将项目版本的"-SNAPSHOT"去掉。
+	发布SNAPSHOT版本： 项目版本增加"-SNAPSHOT"后缀。
+	
+	
+5、项目引用内部jar
+	在项目的pom.xml中增加如下配置：
+	<repositories>
+        <repository>
+            <id>releases</id>
+            <name>releases</name>
+            <url>http://192.168.21.166:28081/nexus/content/repositories/releases/</url>
+        </repository>
+
+        <repository>
+            <id>snapshots</id>
+            <name>snapshots</name>
+            <url>http://192.168.21.166:28081/nexus/content/repositories/snapshots/</url>
+        </repository>
+    </repositories>
+	
+	然后在<dependencies></dependencies>中增加要应用的jar坐标信息。例如：
+	<dependencies>
+	
+		......
+		
+	    <dependency>
+            <groupId>com.alphasta</groupId>
+            <artifactId>mymath</artifactId>
+            <version>1.0[-SNAPSHOT]</version>
+        </dependency>
+	</dependencies>
